@@ -15,15 +15,17 @@
  * =============================================================================
  */
 
-import * as tf from '@tensorflow/tfjs-core';
-import * as gl_util from './gl_util';
-import {RearrangedData} from './interfaces';
+// import * as tf from "@tensorflow/tfjs-core";
+import { getWebGLBackend } from "./getWebGLBackend";
+import * as gl_util from "./gl_util";
+import { RearrangedData } from "./interfaces";
 
 // Returns the GLSL source code needed for
 // computing distances in a rearranged data format
 // It assumes that dimensions are distributed in the RGBA channels
-export function generateDistanceComputationSource(format: RearrangedData):
-    string {
+export function generateDistanceComputationSource(
+  format: RearrangedData
+): string {
   const source = `
     #define DATA_NUM_PACKED_DIMENSIONS ${format.pixelsPerPoint}.
     #define DATA_POINTS_PER_ROW ${format.pointsPerRow}.
@@ -138,82 +140,104 @@ export function generateMNISTDistanceComputationSource(): string {
 
 // Generates the texture for a KNN containing a number of synthetic clusters
 export function generateKNNClusterTexture(
-    numPoints: number, numClusters: number,
-    numNeighbors: number): {knnGraph: WebGLTexture, dataShape: RearrangedData} {
+  numPoints: number,
+  numClusters: number,
+  numNeighbors: number
+): { knnGraph: WebGLTexture; dataShape: RearrangedData } {
   // Computing data shape
-  const pointsPerRow =
-      Math.max(1,
-        Math.floor(Math.sqrt(numPoints * numNeighbors) / numNeighbors));
+  const pointsPerRow = Math.max(
+    1,
+    Math.floor(Math.sqrt(numPoints * numNeighbors) / numNeighbors)
+  );
   const numRows = Math.ceil(numPoints / pointsPerRow);
-  const dataShape =
-      {numPoints, pixelsPerPoint: numNeighbors, numRows, pointsPerRow};
+  const dataShape = {
+    numPoints,
+    pixelsPerPoint: numNeighbors,
+    numRows,
+    pointsPerRow,
+  };
 
   // Initializing the kNN
   const pointsPerCluster = Math.ceil(numPoints / numClusters);
-  const textureValues =
-      new Float32Array(pointsPerRow * numNeighbors * numRows * 2);
+  const textureValues = new Float32Array(
+    pointsPerRow * numNeighbors * numRows * 2
+  );
   for (let i = 0; i < numPoints; ++i) {
     const clusterId = Math.floor(i / pointsPerCluster);
     for (let n = 0; n < numNeighbors; ++n) {
       const id = (i * numNeighbors + n) * 2;
-      textureValues[id] = Math.floor(Math.random() * pointsPerCluster) +
-          clusterId * pointsPerCluster;
+      textureValues[id] =
+        Math.floor(Math.random() * pointsPerCluster) +
+        clusterId * pointsPerCluster;
       textureValues[id + 1] = Math.random();
     }
   }
 
-  // Generating texture
-  const backend = tf.ENV.findBackend('webgl') as tf.webgl.MathBackendWebGL;
-  if (backend === null) {
-    throw Error('WebGL backend is not available');
-  }
+  const backend = getWebGLBackend();
   const gpgpu = backend.getGPGPUContext();
   const knnGraph = gl_util.createAndConfigureTexture(
-      gpgpu.gl, pointsPerRow * numNeighbors, numRows, 2, textureValues);
+    gpgpu.gl,
+    pointsPerRow * numNeighbors,
+    numRows,
+    2,
+    textureValues
+  );
 
-  return {knnGraph, dataShape};
+  return { knnGraph, dataShape };
 }
 
 // Generates the texture for a KNN containing a synthetic line
-export function generateKNNLineTexture(numPoints: number, numNeighbors: number):
-    {knnGraph: WebGLTexture, dataShape: RearrangedData} {
+export function generateKNNLineTexture(
+  numPoints: number,
+  numNeighbors: number
+): { knnGraph: WebGLTexture; dataShape: RearrangedData } {
   // Computing data shape
-  const pointsPerRow =
-      Math.max(1,
-        Math.floor(Math.sqrt(numPoints * numNeighbors) / numNeighbors));
+  const pointsPerRow = Math.max(
+    1,
+    Math.floor(Math.sqrt(numPoints * numNeighbors) / numNeighbors)
+  );
   const numRows = Math.ceil(numPoints / pointsPerRow);
-  const dataShape =
-      {numPoints, pixelsPerPoint: numNeighbors, numRows, pointsPerRow};
+  const dataShape = {
+    numPoints,
+    pixelsPerPoint: numNeighbors,
+    numRows,
+    pointsPerRow,
+  };
 
   // Initializing the kNN
-  const textureValues =
-      new Float32Array(pointsPerRow * numNeighbors * numRows * 2);
+  const textureValues = new Float32Array(
+    pointsPerRow * numNeighbors * numRows * 2
+  );
   for (let i = 0; i < numPoints; ++i) {
     for (let n = 0; n < numNeighbors; ++n) {
       const id = (i * numNeighbors + n) * 2;
       // Neigh
       textureValues[id] =
-          Math.floor(i + n - (numNeighbors / 2) + numPoints) % numPoints;
+        Math.floor(i + n - numNeighbors / 2 + numPoints) % numPoints;
       textureValues[id + 1] = 1;
     }
   }
 
   // Generating texture
-  const backend = tf.ENV.findBackend('webgl') as tf.webgl.MathBackendWebGL;
-  if (backend === null) {
-    throw Error('WebGL backend is not available');
-  }
+  const backend = getWebGLBackend();
   const gpgpu = backend.getGPGPUContext();
   const knnGraph = gl_util.createAndConfigureTexture(
-      gpgpu.gl, pointsPerRow * numNeighbors, numRows, 2, textureValues);
+    gpgpu.gl,
+    pointsPerRow * numNeighbors,
+    numRows,
+    2,
+    textureValues
+  );
 
-  return {knnGraph, dataShape};
+  return { knnGraph, dataShape };
 }
 
 // Generates the texture for a KNN containing a number of synthetic clusters
 export function generateKNNClusterData(
-    numPoints: number, numClusters: number,
-    numNeighbors: number): {distances: Float32Array, indices: Uint32Array} {
+  numPoints: number,
+  numClusters: number,
+  numNeighbors: number
+): { distances: Float32Array; indices: Uint32Array } {
   const pointsPerCluster = Math.ceil(numPoints / numClusters);
   const distances = new Float32Array(numPoints * numNeighbors);
   const indices = new Uint32Array(numPoints * numNeighbors);
@@ -221,29 +245,32 @@ export function generateKNNClusterData(
   for (let i = 0; i < numPoints; ++i) {
     const clusterId = Math.floor(i / pointsPerCluster);
     for (let n = 0; n < numNeighbors; ++n) {
-      const id = (i * numNeighbors + n);
+      const id = i * numNeighbors + n;
       distances[id] = Math.random();
-      indices[id] = Math.floor(Math.random() * pointsPerCluster) +
-          clusterId * pointsPerCluster;
+      indices[id] =
+        Math.floor(Math.random() * pointsPerCluster) +
+        clusterId * pointsPerCluster;
     }
   }
-  return {distances, indices};
+  return { distances, indices };
 }
 
 // Generates the texture for a KNN containing a synthetic line
-export function generateKNNLineData(numPoints: number, numNeighbors: number):
-    {distances: Float32Array, indices: Uint32Array} {
+export function generateKNNLineData(
+  numPoints: number,
+  numNeighbors: number
+): { distances: Float32Array; indices: Uint32Array } {
   // Initializing the kNN
   const distances = new Float32Array(numPoints * numNeighbors);
   const indices = new Uint32Array(numPoints * numNeighbors);
 
   for (let i = 0; i < numPoints; ++i) {
     for (let n = 0; n < numNeighbors; ++n) {
-      const id = (i * numNeighbors + n);
+      const id = i * numNeighbors + n;
       distances[id] = 1;
       indices[id] =
-          Math.floor(i + n - (numNeighbors / 2) + numPoints) % numPoints;
+        Math.floor(i + n - numNeighbors / 2 + numPoints) % numPoints;
     }
   }
-  return {distances, indices};
+  return { distances, indices };
 }

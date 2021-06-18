@@ -19,22 +19,27 @@
  * Karma configuration
  * @param {Object} config configuration
  */
-module.exports = function(config) {
-  config.set({
-    frameworks: ['jasmine', 'karma-typescript'],
-    files: [
-      './src/*.ts'  // *.tsx for React Jsx
-    ],
-    preprocessors: {
-      '**/*.ts': 'karma-typescript'  // *.tsx for React Jsx
-    },
-    reporters: ['progress', 'karma-typescript'],
-    browsers: ['Chrome'],
-    karmaTypescriptConfig: {
-      tsconfig: './tsconfig-es2017.json',
-      compilerOptions: {module: 'commonjs', sourceMap: true}
-    },
-    browserNoActivityTimeout: 30000,
-    client: {args: ['--grep', config.grep || '']}
-  });
+module.exports = function (config) {
+	config.set({
+		frameworks: ['jasmine', 'karma-typescript'],
+		files: [
+			'./src/*.ts'  // *.tsx for React Jsx
+		],
+		preprocessors: {
+			'**/*.ts': 'karma-typescript'  // *.tsx for React Jsx
+		},
+		reporters: ['progress', 'karma-typescript'],
+		browsers: ['Chrome'],
+		karmaTypescriptConfig: {
+			tsconfig: './tsconfig.json',
+			compilerOptions: { module: 'commonjs', sourceMap: true },
+			bundlerOptions: {
+				transforms: [
+					require("karma-typescript-es6-transform")()
+				]
+			}
+		},
+		browserNoActivityTimeout: 30000,
+		client: { args: ['--grep', config.grep || ''] }
+	});
 };

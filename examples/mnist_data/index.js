@@ -114,18 +114,18 @@ function executeRenderTextureToScreenQuad(
   gl.enable(gl.DEPTH_TEST);
   gl.scissor(left, bottom, width, height);
   gl.viewport(left, bottom, width, height);
-  gl.clearColor(1.0,1.0,1.0,1.);
+  gl.clearColor(1.0, 1.0, 1.0, 1.);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   // vertex and texture coords in one buffer
   const vertexCoords = new Float32Array([
-    -1.0, -1.0,   0.0, 0.0,
-     1.0, -1.0,   1.0, 0.0,
-     1.0,  1.0,   1.0, 1.0,
-    -1.0, -1.0,   0.0, 0.0,
-     1.0,  1.0,   1.0, 1.0,
-    -1.0,  1.0,   0.0, 1.0
+    -1.0, -1.0, 0.0, 0.0,
+    1.0, -1.0, 1.0, 0.0,
+    1.0, 1.0, 1.0, 1.0,
+    -1.0, -1.0, 0.0, 0.0,
+    1.0, 1.0, 1.0, 1.0,
+    -1.0, 1.0, 0.0, 1.0
   ]);
 
   const vertexCoordsBuffer = tf.webgl.webgl_util.createStaticVertexBuffer(
@@ -241,16 +241,16 @@ function executeTextureDisplayProgram(
   gl.viewport(left, bottom, width, height);
   gl.clearColor(1., 1., 1., 1.);
   tf.webgl.webgl_util.callAndCheck(
-    gl, () =>gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT));
+    gl, () => gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT));
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   const quadVertices = new Float32Array([
-    -1,-1,
-    1,-1,
+    -1, -1,
+    1, -1,
     1, 1,
-    -1,-1,
+    -1, -1,
     1, 1,
     -1, 1]);
 
@@ -275,7 +275,7 @@ function executeTextureDisplayProgram(
   gl.uniform1f(uniforms.tex_norm, textureNorm);
   let scale_s_field = 1;
   if (numPoints < 2000) {
-    scale_s_field -= 0.9 * (2000 - numPoints)/2000;
+    scale_s_field -= 0.9 * (2000 - numPoints) / 2000;
   }
   gl.uniform1f(uniforms.scale_s_field, scale_s_field);
   // Create the buffer object
@@ -375,7 +375,7 @@ function createAndConfigureUint32Texture(gl, width, height, pixels) {
     gl, () => gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST));
   tf.webgl.webgl_util.callAndCheck(
     gl, () => gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32UI, width, height,
-                            0, gl.RED_INTEGER, gl.UNSIGNED_INT, pixels));
+      0, gl.RED_INTEGER, gl.UNSIGNED_INT, pixels));
   // end texture ops
   tf.webgl.webgl_util.callAndCheck(
     gl, () => gl.bindTexture(gl.TEXTURE_2D, null));
@@ -456,10 +456,10 @@ function executeOffscreenPointRender(
   // clear both textures
   let attachBufs = [gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT0 + 1];
   tf.webgl.webgl_util.callAndCheck(
-    gl, ()=> gl.drawBuffers(attachBufs ));
+    gl, () => gl.drawBuffers(attachBufs));
 
-  tf.webgl.webgl_util.callAndCheck(gl, () =>gl.clearBufferfv(gl.COLOR, 0, [0.0,0.0,0.0,0.0]));
-  tf.webgl.webgl_util.callAndCheck(gl, () =>gl.clearBufferuiv(gl.COLOR, 1, [0,0,0,0]));
+  tf.webgl.webgl_util.callAndCheck(gl, () => gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0]));
+  tf.webgl.webgl_util.callAndCheck(gl, () => gl.clearBufferuiv(gl.COLOR, 1, [0, 0, 0, 0]));
 
   gl.viewport(0, 0, width, height);
 
@@ -477,7 +477,7 @@ function executeOffscreenPointRender(
 
   gl.uniform2f(uniforms.maxV, maxX, maxY);
   tf.webgl.webgl_util.callAndCheck(
-     gl, () => gl.drawArrays(gl.POINTS, 0, numPoints));
+    gl, () => gl.drawArrays(gl.POINTS, 0, numPoints));
   gl.disable(gl.BLEND);
 }
 
@@ -548,15 +548,15 @@ function initPlotPrograms() {
 // Reduce the MNIST images to newWidth newHeight
 // and take the first numImages
 function subsampleTensorImages(tensor,
-                               oldWidth,
-                               oldHeight,
-                               newWidth,
-                               newHeight,
-                               numImages) {
-  const subSet = tensor.slice([0,0], [numImages]).
+  oldWidth,
+  oldHeight,
+  newWidth,
+  newHeight,
+  numImages) {
+  const subSet = tensor.slice([0, 0], [numImages]).
     as4D(numImages, oldHeight, oldWidth, 1);
   return subSet.resizeBilinear([newHeight, newWidth]).
-    reshape([numImages, newWidth*newHeight]);
+    reshape([numImages, newWidth * newHeight]);
 }
 
 let displayObjects = {};
@@ -613,7 +613,7 @@ function initCanvas() {
   const digitCanvCtx = digitCanv.getContext('2d');
   blankCanvas(digitCanvCtx);
   clearBackground(backend.getGPGPUContext().gl);
-  return {digitCanvCtx: digitCanvCtx};
+  return { digitCanvCtx: digitCanvCtx };
 }
 
 /**
@@ -623,13 +623,13 @@ function initCanvas() {
  * @returns {{imgData: ImageData, pixArray: Uint8ClampedArray}}
  */
 function blankCanvas(ctx) {
-  const imgData = ctx.getImageData(0,0,ctx.canvas.width, ctx.canvas.height);
+  const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
   const pixArray = new Uint8ClampedArray(imgData.data.buffer);
   // zero the buffer for the cumulative plot (black
   const fillArray = new Uint32Array(imgData.data.buffer);
   fillArray.fill(0xFFFFFFFF); //little endian
   ctx.putImageData(imgData, 0, 0);
-  return {imgData: imgData, pixArray: pixArray};
+  return { imgData: imgData, pixArray: pixArray };
 }
 
 /**
@@ -641,7 +641,7 @@ function blankCanvas(ctx) {
 function oneHotToIndex(labels) {
   return tf.tidy(() => {
     const oneHotTensor = tf.tensor2d(labels, [65000, 10], 'int32');
-    const labelPosTensor = tf.tensor1d([0,1,2,3,4,5,6,7,8,9], 'int32');
+    const labelPosTensor = tf.tensor1d([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'int32');
     const labelsTensor = oneHotTensor.mul(labelPosTensor).sum(1);
     return labelsTensor.dataSync();
   });
@@ -656,13 +656,13 @@ async function loadMnist() {
   const resp = await fetch(MNIST_IMAGES_PATH);
   const imgArray = await resp.arrayBuffer();
   const reader = new pngReader();
-  return new Promise ((resolve) => {
+  return new Promise((resolve) => {
     reader.parse(imgArray, (err, png) => {
       // parsed PNG is Uint8 RGBA with range 0-255
       // - convert to RGBA Float32 range 0-1
-      const pixels = new Float32Array(png.data.length/4);
+      const pixels = new Float32Array(png.data.length / 4);
       for (let i = 0; i < pixels.length; i++) {
-        pixels[i] = png.data[i*4]/255.0;
+        pixels[i] = png.data[i * 4] / 255.0;
       }
       resolve(pixels);
     });
@@ -720,7 +720,7 @@ function initBackend() {
   webGlCanvas.style = "width:100vw; height:100vh; margin-top: 0 !important; margin-left: 0 !important; position:absolute; top:0; display:block;";
   let gl = backend.getGPGPUContext().gl;
   gl.getExtension('EXT_float_blend');
-  maxSize= gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
   gl.canvas.width = gl.canvas.offsetWidth;
   gl.canvas.height = gl.canvas.offsetHeight;
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -744,14 +744,14 @@ function resizeCanvas(gl) {
 
 function getLimits(element, gl) {
   const rect = element.getBoundingClientRect();
-  if (rect.bottom < 0 || rect.top  > gl.canvas.clientHeight ||
-    rect.right  < 0 || rect.left > gl.canvas.clientWidth) {
+  if (rect.bottom < 0 || rect.top > gl.canvas.clientHeight ||
+    rect.right < 0 || rect.left > gl.canvas.clientWidth) {
     return [false, -1, -1, -1, -1];  // it's off screen
   }
 
-  const width  = rect.right - rect.left;
+  const width = rect.right - rect.left;
   const height = rect.bottom - rect.top;
-  const left   = rect.left;
+  const left = rect.left;
   const bottom = gl.canvas.clientHeight - rect.bottom - 1;
   return [true, width, height, left, bottom];
 }
@@ -809,7 +809,7 @@ function displayScatterPlot(now) {
   tsneIterElement.innerHTML = 'tsne iteration: ' + data.iteration;
 
   // limit to 5 frames per sec
-  if ((now - lastRenderTime)  <  200) {
+  if ((now - lastRenderTime) < 200) {
     return;
   }
   lastRenderTime = now;
@@ -854,7 +854,7 @@ function displayScatterPlot(now) {
  */
 function colToFloatComp(colArray) {
   const nestedComponents = colArray.map(x =>
-    [((x >> 16) & 0xFF)/255, ((x >> 8) & 0xFF)/255, (x & 0xFF)/255]
+    [((x >> 16) & 0xFF) / 255, ((x >> 8) & 0xFF) / 255, (x & 0xFF) / 255]
   );
   // flatten the array of arrays
   return new Float32Array([].concat.apply([], nestedComponents));
@@ -895,19 +895,19 @@ async function runTsne() {
     0xFF0099]);
   const colors = new Float32Array(numberPoints * 3);
   subLabels.forEach((val, idx) => {
-    colors [idx * 3] = labelColors[val * 3];
-    colors [idx * 3 + 1] = labelColors[val * 3 + 1];
-    colors [idx * 3 + 2] = labelColors[val * 3 + 2];
+    colors[idx * 3] = labelColors[val * 3];
+    colors[idx * 3 + 1] = labelColors[val * 3 + 1];
+    colors[idx * 3 + 2] = labelColors[val * 3 + 2];
   });
   initBuffers(numberPoints, colors);
 
   console.log(`calculating on: ${subTensor.shape}`);
 
-  const perplexity = numberPoints < 240 ? Math.floor(numberPoints/8) : 30;
+  const perplexity = numberPoints < 240 ? Math.floor(numberPoints / 8) : 30;
   const tsneOpt = tf_tsne.tsne(subTensor, {
-    perplexity : perplexity,
-    verbose : true,
-    knnMode : 'auto',
+    perplexity: perplexity,
+    verbose: true,
+    knnMode: 'auto',
   });
 
   const maxKnnIters = document.getElementById('kNNSlider').value;
@@ -920,8 +920,7 @@ async function runTsne() {
   tsneOpt.optimizer.dispose();
 }
 
-async function runAndDisplayKnn(tsneOpt, nIters)
-{
+async function runAndDisplayKnn(tsneOpt, nIters) {
   console.log('started kNN');
   displayObjects['status'].element.innerHTML = '...running kNN';
   await sleep(1);
@@ -976,8 +975,8 @@ function makeTextureCopy(srcTexture, width, height) {
   gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0,
     gl.TEXTURE_2D, dstTexture, 0);
 
-  gl.bindFramebuffer ( gl.DRAW_FRAMEBUFFER, dstFbo );
-  gl.bindFramebuffer ( gl.READ_FRAMEBUFFER, srcFbo );
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, dstFbo);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER, srcFbo);
 
   gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height,
     gl.COLOR_BUFFER_BIT, gl.NEAREST);
@@ -1017,6 +1016,8 @@ async function* tsneResultGenerator(tsneOpt, nIterations, numPoints) {
     }
     embeddingClone = tf.clone(tsneOpt.optimizer.embedding);
     lastRenderTime = 0; // force render
+    const exaggeration = await tsneOpt.optimizer.exaggerationAtCurrentIteration();
+
     yield {
       iteration: count + 1,
       numPoints: numPoints,
@@ -1028,7 +1029,7 @@ async function* tsneResultGenerator(tsneOpt, nIterations, numPoints) {
       maxY: tsneOpt.optimizer.maxY,
       splatTexture: splatTexCopy,
       diameter: tsneOpt.optimizer.splatTextureDiameter,
-      normalizeTex: Math.sqrt(tsneOpt.optimizer.normalizationQ) * tsneOpt.optimizer.exaggerationAtCurrentIteration
+      normalizeTex: Math.sqrt(tsneOpt.optimizer.normalizationQ) * exaggeration
     };
     if (cancel) {
       cancel = false;
@@ -1048,8 +1049,7 @@ function displayIterInfo() {
   displayScatterPlot();
 }
 
-async function runAndDisplayTsne(tsneOpt, nIterations, numPoints)
-{
+async function runAndDisplayTsne(tsneOpt, nIterations, numPoints) {
   window.requestAnimationFrame(displayIterInfo);
   console.log('started RAF');
   for await (const iterInfo of tsneResultGenerator(tsneOpt, nIterations, numPoints)) {
@@ -1096,13 +1096,13 @@ async function digitOnCanvas(digitCtx, digitData) {
  */
 function plotExplore(plotCtx, digitCtx, e) {
   const rect = plotCtx.getBoundingClientRect();
-  const x  = e.clientX - rect.left;
-  const y  = e.clientY - rect.top;
-  const id = executeHitSampleProgram(x, 511-y);
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const id = executeHitSampleProgram(x, 511 - y);
   if (id < 1) {
     return;
   }
-  const digitData = dataSet.slice((id-1)*784, (id)*784);
+  const digitData = dataSet.slice((id - 1) * 784, (id) * 784);
   digitOnCanvas(digitCtx, digitData);
 }
 
@@ -1110,7 +1110,7 @@ function restart() {
   cancel = true;
   enableViz = false;
   clearOffscreenState();
-  setTimeout(async ()=> {
+  setTimeout(async () => {
     initCanvas();
     await runTsne()
   }, 1000)
@@ -1125,7 +1125,7 @@ function updatePoints() {
   document.getElementById('pntSliderVal').innerHTML = 'num MNIST points: ' + nPoints.toString().padStart(6, '\u2002');
 }
 
-window.onload = async function() {
+window.onload = async function () {
   initBackend();
   const contexts = initCanvas();
   const digitCtx = contexts.digitCanvCtx;
