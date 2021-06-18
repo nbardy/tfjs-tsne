@@ -1,3 +1,6 @@
+## Fork Modifications
+This is a modification of an old tfjs-tsne repo to work with modern tfjs
+
 ## tSNE for TensorFlow.js
 
 This library contains a improved tSNE implementation that runs in the browser.
